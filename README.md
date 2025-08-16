@@ -5,7 +5,7 @@
 [![bugs](https://sonarcloud.io/api/project_badges/measure?metric=bugs&project=Netcracker_qubership-core-junit-k8s-extension)](https://sonarcloud.io/summary/overall?id=Netcracker_qubership-core-junit-k8s-extension)
 [![code_smells](https://sonarcloud.io/api/project_badges/measure?metric=code_smells&project=Netcracker_qubership-core-junit-k8s-extension)](https://sonarcloud.io/summary/overall?id=Netcracker_qubership-core-junit-k8s-extension)
 
-## JUnit-5 extension to connect to Kubernetes in integration tests
+## JUnit 5 extension to connect to Kubernetes in integration tests
 
 <!-- TOC -->
   * [JUnit-5 extension to connect to Kubernetes in integration tests](#junit-5-extension-to-connect-to-kubernetes-in-integration-tests)
