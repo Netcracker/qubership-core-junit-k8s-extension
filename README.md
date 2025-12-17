@@ -149,6 +149,40 @@ For example:
 
 #### More examples how to inject tests util services can be found [here](cloud-core-extension/src/test/java/com/netcracker/cloud/junit/cloudcore/extension/callbacks/classes/TestClass.java)
 
+### Kubernetes client configuration via @Cloud and system properties
+
+You can tune several Kubernetes client parameters either per-field using the `@Cloud` annotation or globally via JVM system properties. The precedence is:
+
+1. `@Cloud` annotation value (or the `prop` referenced by the annotation)
+2. System property `clouds.<context>.<parameter>`
+3. Library default
+
+Supported parameters and their defaults:
+
+- `requestTimeout` &nbsp; — request timeout in milliseconds. Default: `10000`.
+- `websocketPingInterval` &nbsp; — websocket ping interval in milliseconds. Default: `10000`.
+- `watchReconnectInterval` &nbsp; — watch reconnect interval in milliseconds. Default: `5000`.
+
+Annotation examples (per-field):
+
+```java
+@Cloud(requestTimeout = @IntValue(15000))
+private KubernetesClient kubernetesClientWithLongTimeout;
+
+@Cloud(websocketPingInterval = @IntValue(prop = "clouds.myCloud.websocketPingInterval"))
+private KubernetesClient kubernetesClientWithPropBasedWebsocketPing;
+```
+
+System property examples (global fallback):
+
+```
+-Dclouds.myCloud.requestTimeout=12000 \
+-Dclouds.myCloud.websocketPingInterval=20000 \
+-Dclouds.myCloud.watchReconnectInterval=7000
+```
+
+When the extension creates a `KubernetesClient`, it resolves these parameters using the precedence described above and configures the Fabric8 `Config` accordingly.
+
 #### Pod Scale > 1
 By default, port-forward is linked to any of the pods found by the service selector.
 In case when port-forward to the particular pod is required - use
