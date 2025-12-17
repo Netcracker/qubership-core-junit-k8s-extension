@@ -7,6 +7,7 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 import java.lang.reflect.Field;
 
 import static com.netcracker.cloud.junit.cloudcore.extension.callbacks.CloudCoreJunitCallback.resolveValue;
+import static com.netcracker.cloud.junit.cloudcore.extension.callbacks.CloudCoreJunitCallback.resolveIntValue;
 
 public class KubernetesClientProvider implements FieldInstanceProvider {
 
@@ -16,7 +17,10 @@ public class KubernetesClientProvider implements FieldInstanceProvider {
                 .orElseThrow(() -> new IllegalStateException("No KubernetesClientFactory implementation found"));
         String cloud = resolveValue(testInstance, field, Cloud.class, Cloud::cloud, kubernetesClientFactory.getCurrentContext());
         String namespace = resolveValue(testInstance, field, Cloud.class, Cloud::namespace, kubernetesClientFactory.getNamespace());
-        return kubernetesClientFactory.getKubernetesClient(cloud, namespace);
+        int requestTimeout = resolveIntValue(testInstance, field, Cloud.class, Cloud::requestTimeout);
+        int websocketPingInterval = resolveIntValue(testInstance, field, Cloud.class, Cloud::websocketPingInterval);
+        int watchReconnectInterval = resolveIntValue(testInstance, field, Cloud.class, Cloud::watchReconnectInterval);
+        return kubernetesClientFactory.getKubernetesClient(cloud, namespace, requestTimeout, websocketPingInterval, watchReconnectInterval);
     }
 
     @Override

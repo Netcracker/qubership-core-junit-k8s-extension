@@ -13,4 +13,10 @@ public @interface Cloud {
 
     Value namespace() default @Value(prop = "clouds.cloud.namespaces.namespace");
 
+    IntValue requestTimeout() default @IntValue(10000);
+
+    IntValue websocketPingInterval() default @IntValue(10000);
+
+    IntValue watchReconnectInterval() default @IntValue(5000);
+
 }
