@@ -29,9 +29,7 @@ public class DefaultKubernetesClientFactory implements AutoCloseable, Kubernetes
         this.config = config;
     }
 
-    private final static ConcurrentHashMap<ClientKey, KubernetesClient> clientsMap = new ConcurrentHashMap<>();
-
-    // ClientKey moved to provider package: com.netcracker.cloud.junit.cloudcore.extension.provider.ClientKey
+    private final ConcurrentHashMap<ClientKey, KubernetesClient> clientsMap = new ConcurrentHashMap<>();
 
     public Collection<String> getKubernetesContexts() {
         return config.getContexts().stream().map(NamedContext::getName).toList();
