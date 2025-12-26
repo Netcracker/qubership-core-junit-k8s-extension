@@ -149,12 +149,14 @@ For example:
 
 #### More examples how to inject tests util services can be found [here](cloud-core-extension/src/test/java/com/netcracker/cloud/junit/cloudcore/extension/callbacks/classes/TestClass.java)
 
-### Kubernetes client configuration via @Cloud and system properties
+### Kubernetes client configuration via @Client and system properties
 
-You can tune several Kubernetes client parameters either per-field using the `@Cloud` annotation or globally via JVM system properties. The precedence is:
+You can tune Kubernetes client parameters (timeouts, intervals) either per-field using the `@Client` annotation or globally via JVM system properties. The `@Client` annotation is separate from the `@Cloud` annotation and focuses solely on client-level configuration.
 
-1. `@Cloud` annotation value (or the `prop` referenced by the annotation)
-2. System property `clouds.<context>.<parameter>`
+Precedence:
+
+1. `@Client` annotation value (or the `prop` referenced by the annotation)
+2. System property `client.<context>.<parameter>`
 3. Library default
 
 Supported parameters and their defaults:
@@ -166,19 +168,21 @@ Supported parameters and their defaults:
 Annotation examples (per-field):
 
 ```java
-@Cloud(requestTimeout = @IntValue(15000))
+@Cloud
+@Client(requestTimeout = @IntValue(15000))
 private KubernetesClient kubernetesClientWithLongTimeout;
 
-@Cloud(websocketPingInterval = @IntValue(prop = "clouds.myCloud.websocketPingInterval"))
+@Cloud
+@Client(websocketPingInterval = @IntValue(prop = "client.myCloud.websocketPingInterval"))
 private KubernetesClient kubernetesClientWithPropBasedWebsocketPing;
 ```
 
 System property examples (global fallback):
 
 ```
--Dclouds.myCloud.requestTimeout=12000 \
--Dclouds.myCloud.websocketPingInterval=20000 \
--Dclouds.myCloud.watchReconnectInterval=7000
+-Dclient.myCloud.requestTimeout=12000 \
+-Dclient.myCloud.websocketPingInterval=20000 \
+-Dclient.myCloud.watchReconnectInterval=7000
 ```
 
 When the extension creates a `KubernetesClient`, it resolves these parameters using the precedence described above and configures the Fabric8 `Config` accordingly.

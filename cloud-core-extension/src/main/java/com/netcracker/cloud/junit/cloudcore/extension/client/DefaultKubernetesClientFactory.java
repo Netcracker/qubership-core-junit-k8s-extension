@@ -1,6 +1,8 @@
 package com.netcracker.cloud.junit.cloudcore.extension.client;
 
 import com.netcracker.cloud.junit.cloudcore.extension.annotations.Priority;
+import com.netcracker.cloud.junit.cloudcore.extension.provider.CloudAndNamespace;
+import com.netcracker.cloud.junit.cloudcore.extension.provider.ClientKey;
 import io.fabric8.kubernetes.api.model.NamedContext;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.ConfigBuilder;
@@ -29,7 +31,15 @@ public class DefaultKubernetesClientFactory implements AutoCloseable, Kubernetes
         this.config = config;
     }
 
-    private final ConcurrentHashMap<ClientKey, KubernetesClient> clientsMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, KubernetesClient> clientsMap = new ConcurrentHashMap<>();
+
+    // Composite cache key combining CloudAndNamespace with ClientKey
+    private static String getCacheKey(CloudAndNamespace cloudNamespace, ClientKey clientKey) {
+        return cloudNamespace.getCloud() + "|" + cloudNamespace.getNamespace() + "|" + 
+               (clientKey.getRequestTimeout() != null ? clientKey.getRequestTimeout() : "-") + "|" +
+               (clientKey.getWebsocketPingInterval() != null ? clientKey.getWebsocketPingInterval() : "-") + "|" +
+               (clientKey.getWatchReconnectInterval() != null ? clientKey.getWatchReconnectInterval() : "-");
+    }
 
     public Collection<String> getKubernetesContexts() {
         return config.getContexts().stream().map(NamedContext::getName).toList();
@@ -41,9 +51,12 @@ public class DefaultKubernetesClientFactory implements AutoCloseable, Kubernetes
 
     public KubernetesClient getKubernetesClient(String context, String namespace, Integer requestTimeoutMillis,
                                                 Integer websocketPingIntervalMillis, Integer watchReconnectIntervalMillis) {
-        return clientsMap.computeIfAbsent(new ClientKey(context, namespace, requestTimeoutMillis,
-                websocketPingIntervalMillis, watchReconnectIntervalMillis), clientKey -> {
-            String cloud = clientKey.getCloud();
+        CloudAndNamespace cloudNamespace = new CloudAndNamespace(context, namespace);
+        ClientKey clientKey = new ClientKey(requestTimeoutMillis, websocketPingIntervalMillis, watchReconnectIntervalMillis);
+        String cacheKey = getCacheKey(cloudNamespace, clientKey);
+        
+        return clientsMap.computeIfAbsent(cacheKey, key -> {
+            String cloud = cloudNamespace.getCloud();
             NamedContext namedContext = config.getContexts().stream()
                     .filter(c -> Objects.equals(c.getName(), cloud)).findFirst()
                     .orElseThrow(() -> new IllegalArgumentException(String.format("Unknown context: '%s'. Known contexts:\n[%s]",
@@ -59,7 +72,7 @@ public class DefaultKubernetesClientFactory implements AutoCloseable, Kubernetes
             int resolvedWatchReconnect = resolveIntParameter(cloud, clientKey.getWatchReconnectInterval(), "watchReconnectInterval", 5000);
 
             config = new ConfigBuilder(config)
-                    .withNamespace(clientKey.getNamespace())
+                    .withNamespace(namespace)
                     .withTrustCerts(true)
                     .withDisableHostnameVerification(true)
                     .withRequestRetryBackoffLimit(3)
@@ -79,7 +92,7 @@ public class DefaultKubernetesClientFactory implements AutoCloseable, Kubernetes
             return passedValue;
         }
         try {
-            String propName = String.format("clouds.%s.%s", context, propNameSuffix);
+            String propName = String.format("client.%s.%s", context, propNameSuffix);
             String prop = System.getProperty(propName);
             if (prop != null && !prop.isBlank()) {
                 return Integer.parseInt(prop);
@@ -102,7 +115,7 @@ public class DefaultKubernetesClientFactory implements AutoCloseable, Kubernetes
 
     @Override
     public void close() {
-        HashMap<ClientKey, KubernetesClient> copy = new HashMap<>(clientsMap);
+        HashMap<String, KubernetesClient> copy = new HashMap<>(clientsMap);
         clientsMap.clear();
         copy.values().forEach(KubernetesClient::close);
     }

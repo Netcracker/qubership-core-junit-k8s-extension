@@ -96,9 +96,9 @@ public class DefaultKubernetesClientFactoryTimeoutTest {
         try {
             System.setProperty("clouds.cloud.name", cloud);
             System.setProperty("clouds.cloud.namespaces.namespace", namespace);
-            System.setProperty("clouds." + cloud + ".requestTimeout", "2222");
-            System.setProperty("clouds." + cloud + ".websocketPingInterval", "3333");
-            System.setProperty("clouds." + cloud + ".watchReconnectInterval", "4444");
+            System.setProperty("client." + cloud + ".requestTimeout", "2222");
+            System.setProperty("client." + cloud + ".websocketPingInterval", "3333");
+            System.setProperty("client." + cloud + ".watchReconnectInterval", "4444");
 
             Config config = Mockito.mock(Config.class);
             AtomicReference<Consumer<HttpClient.Builder>> consumer = new AtomicReference<>();
@@ -154,9 +154,9 @@ public class DefaultKubernetesClientFactoryTimeoutTest {
         } finally {
             System.clearProperty("clouds.cloud.name");
             System.clearProperty("clouds.cloud.namespaces.namespace");
-            System.clearProperty("clouds." + cloud + ".requestTimeout");
-            System.clearProperty("clouds." + cloud + ".websocketPingInterval");
-            System.clearProperty("clouds." + cloud + ".watchReconnectInterval");
+            System.clearProperty("client." + cloud + ".requestTimeout");
+            System.clearProperty("client." + cloud + ".websocketPingInterval");
+            System.clearProperty("client." + cloud + ".watchReconnectInterval");
         }
     }
 }

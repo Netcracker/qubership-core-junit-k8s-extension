@@ -1,5 +1,6 @@
 package com.netcracker.cloud.junit.cloudcore.extension.callbacks.classes;
 
+import com.netcracker.cloud.junit.cloudcore.extension.annotations.Client;
 import com.netcracker.cloud.junit.cloudcore.extension.annotations.Cloud;
 import com.netcracker.cloud.junit.cloudcore.extension.annotations.IntValue;
 import com.netcracker.cloud.junit.cloudcore.extension.annotations.PortForward;
@@ -17,8 +18,10 @@ public class TestClass {
     @Getter
     public static class TestKubernetesClient {
         @Cloud(cloud = @Value(prop = "clouds.cloud_1.name"), namespace = @Value(prop = "clouds.cloud_1.namespaces.origin"))
+        @Client
         KubernetesClient cloud1KubernetesClient;
         @Cloud(cloud = @Value(prop = "clouds.cloud_2.name"), namespace = @Value(prop = "clouds.cloud_2.namespaces.origin"))
+        @Client
         KubernetesClient cloud2KubernetesClient;
     }
 

@@ -5,12 +5,17 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Configures fabric8 client parameters.
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD})
-public @interface Cloud {
+public @interface Client {
 
-    Value cloud() default @Value(prop = "clouds.cloud.name");
+    IntValue requestTimeout() default @IntValue(5000);
 
-    Value namespace() default @Value(prop = "clouds.cloud.namespaces.namespace");
+    IntValue websocketPingInterval() default @IntValue(10000);
+
+    IntValue watchReconnectInterval() default @IntValue(5000);
 
 }
