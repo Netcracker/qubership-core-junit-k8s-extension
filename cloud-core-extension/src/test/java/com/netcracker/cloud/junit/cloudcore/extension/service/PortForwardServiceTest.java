@@ -56,12 +56,12 @@ public class PortForwardServiceTest {
             LocalPortForward localPortForward8080 = mock(LocalPortForward.class);
             LocalPortForward localPortForward8181 = mock(LocalPortForward.class);
             when(testServiceResource.portForward(Mockito.anyInt(), Mockito.any(InetAddress.class), Mockito.anyInt())).then(i -> {
-                int localPort = i.getArgument(2);
+                int targetPort = i.getArgument(0);
                 LocalPortForward localPortForward;
-                if (localPort == 8080) localPortForward = localPortForward8080;
+                if (targetPort == 8080) localPortForward = localPortForward8080;
                 else localPortForward = localPortForward8181;
                 when(localPortForward.getLocalAddress()).thenReturn(i.getArgument(1));
-                when(localPortForward.getLocalPort()).thenReturn(localPort);
+                when(localPortForward.getLocalPort()).thenReturn(i.getArgument(2));
                 return localPortForward;
             });
 
@@ -120,12 +120,12 @@ public class PortForwardServiceTest {
             LocalPortForward localPortForward8080 = mock(LocalPortForward.class);
             LocalPortForward localPortForward8181 = mock(LocalPortForward.class);
             when(testServiceResource.portForward(Mockito.anyInt(), Mockito.any(InetAddress.class), Mockito.anyInt())).then(i -> {
-                int localPort = i.getArgument(2);
+                int targetPort = i.getArgument(0);
                 LocalPortForward localPortForward;
-                if (localPort == 8080) localPortForward = localPortForward8080;
+                if (targetPort == 8080) localPortForward = localPortForward8080;
                 else localPortForward = localPortForward8181;
                 when(localPortForward.getLocalAddress()).thenReturn(i.getArgument(1));
-                when(localPortForward.getLocalPort()).thenReturn(localPort);
+                when(localPortForward.getLocalPort()).thenReturn(i.getArgument(2));
                 return localPortForward;
             });
 
@@ -254,12 +254,12 @@ public class PortForwardServiceTest {
             LocalPortForward localPortForward8080 = mock(LocalPortForward.class);
             LocalPortForward localPortForward8181 = mock(LocalPortForward.class);
             when(testServiceResource.portForward(Mockito.anyInt(), Mockito.any(InetAddress.class), Mockito.anyInt())).then(i -> {
-                int localPort = i.getArgument(2);
+                int targetPort = i.getArgument(0);
                 LocalPortForward localPortForward;
-                if (localPort == 8080) localPortForward = localPortForward8080;
+                if (targetPort == 8080) localPortForward = localPortForward8080;
                 else localPortForward = localPortForward8181;
                 when(localPortForward.getLocalAddress()).thenReturn(i.getArgument(1));
-                when(localPortForward.getLocalPort()).thenReturn(localPort);
+                when(localPortForward.getLocalPort()).thenReturn(i.getArgument(2));
                 return localPortForward;
             });
 

@@ -9,11 +9,13 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.net.BindException;
 import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.time.Duration;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
@@ -39,6 +41,7 @@ public class PortForwardService {
         String cloud = kubernetesClient.getMasterUrl().getHost();
         String name = params.getName();
         int targetPort = params.getPort();
+        int localPort = getFreePort();
         // i.e. my-svc.my-namespace.svc.cluster-domain.example
         String host = fqdn ? String.format("%s.svc.%s", params.host(namespace), cloud) : params.host(namespace);
         Endpoint endpoint = new Endpoint(host, targetPort);
@@ -52,10 +55,10 @@ public class PortForwardService {
                 try {
                     if (params instanceof PodPortForwardParams) {
                         portForward = kubernetesClient.pods().inNamespace(namespace).withName(name)
-                                .portForward(targetPort, inetAddress, targetPort);
+                                .portForward(targetPort, inetAddress, localPort);
                     } else if (params instanceof ServicePortForwardParams || params instanceof UrlPortForwardParams) {
                         portForward = kubernetesClient.services().inNamespace(namespace).withName(name)
-                                .portForward(targetPort, inetAddress, targetPort);
+                                .portForward(targetPort, inetAddress, localPort);
                     } else {
                         throw new IllegalArgumentException("Unsupported port forward params type: " + params.getClass().getName());
                     }
@@ -73,6 +76,14 @@ public class PortForwardService {
             }
         }
         return params.supply(new NetSocketAddress(host, portForward.getLocalPort()));
+    }
+
+    private int getFreePort() {
+        try (var s = new ServerSocket(0)){
+            return s.getLocalPort();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void closePortForwards() {

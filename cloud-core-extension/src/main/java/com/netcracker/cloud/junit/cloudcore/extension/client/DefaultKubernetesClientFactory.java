@@ -54,7 +54,7 @@ public class DefaultKubernetesClientFactory implements AutoCloseable, Kubernetes
                     .withDisableHostnameVerification(true)
                     .withRequestRetryBackoffLimit(3)
                     .withWatchReconnectLimit(3)
-                    .withRequestTimeout(10000)
+                    .withRequestTimeout(Integer.parseInt(System.getProperty("nc.junit.k8s.request.timeout", "10000")))
                     .withWebsocketPingInterval(10000)
                     .withWatchReconnectInterval(5000)
                     .build();
